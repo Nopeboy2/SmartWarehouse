@@ -1,0 +1,6 @@
+﻿@model SmartWarehouse.Web.ViewModels.StockOperationViewModel
+<input asp-for="IdempotencyKey" type="hidden" />
+<div class="mb-3"><label asp-for="Sku" class="form-label">SKU</label><input asp-for="Sku" class="form-control" placeholder="DEMO-001" /></div>
+<div class="mb-3"><label asp-for="LocationCode" class="form-label">Vị trí kho</label><input asp-for="LocationCode" class="form-control" /></div>
+<div class="mb-3"><label asp-for="Quantity" class="form-label">Số lượng</label><input asp-for="Quantity" class="form-control" type="number" min="1" /></div>
+<div class="mb-3"><label asp-for="ReferenceNumber" class="form-label">Mã tham chiếu</label><input asp-for="ReferenceNumber" class="form-control" /></div>

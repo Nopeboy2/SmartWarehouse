@@ -1,0 +1,13 @@
+﻿@model IReadOnlyList<SmartWarehouse.Application.Warehouse.ProductRow>
+@{
+    ViewData["Title"] = "Sản phẩm";
+}
+<div class="page-heading"><div><span class="eyebrow">DANH MỤC HÀNG HÓA</span><h1>Sản phẩm</h1><p>Quản lý SKU và đơn vị hàng hóa trong kho.</p></div><a class="btn btn-primary" asp-action="Create">+ Thêm sản phẩm</a></div>
+@if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
+<section class="panel"><div class="panel-heading"><div><h2>Danh sách sản phẩm</h2><p>@Model.Count sản phẩm</p></div><div class="search-box"><span>⌕</span><input id="tableSearch" class="form-control" placeholder="Tìm SKU hoặc tên sản phẩm" /></div></div>
+<div class="table-responsive"><table class="table align-middle data-table" id="productsTable"><thead><tr><th>SKU</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Đơn vị</th><th>Trạng thái</th></tr></thead><tbody>
+@foreach (var product in Model) { <tr><td><span class="sku-code">@product.Sku</span></td><td class="fw-semibold">@product.Name</td><td>@product.Category</td><td>@product.UnitOfMeasure</td><td><span class="status-pill @(product.IsActive ? "status-ready" : "status-muted")">@(product.IsActive ? "Đang dùng" : "Ngừng dùng")</span></td></tr> }
+</tbody></table></div>
+@if (Model.Count == 0) { <div class="empty-state"><strong>Chưa có sản phẩm</strong><p>Thêm sản phẩm đầu tiên để quản lý tồn kho.</p></div> }
+</section>
+@section Scripts { <script>document.getElementById('tableSearch')?.addEventListener('input', e => { const q=e.target.value.toLowerCase(); document.querySelectorAll('#productsTable tbody tr').forEach(r => r.hidden=!r.innerText.toLowerCase().includes(q)); });</script> }

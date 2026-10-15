@@ -1,0 +1,6 @@
+﻿@model IReadOnlyList<SmartWarehouse.Application.Warehouse.DeviceRow>
+@{
+    ViewData["Title"] = "Thiết bị";
+}
+<div class="page-heading"><div><span class="eyebrow">GIÁM SÁT KẾT NỐI</span><h1>Thiết bị kho</h1><p>Trạng thái lấy từ database. Các thiết bị bên dưới đang chạy chế độ mô phỏng.</p></div><span class="mode-badge"><i></i> SIMULATION</span></div>
+<div class="row g-3">@foreach(var device in Model){<div class="col-12 col-md-6 col-xl-4"><section class="panel device-panel"><div class="d-flex align-items-center justify-content-between"><span class="device-symbol">@device.Type[..Math.Min(2,device.Type.Length)].ToUpperInvariant()</span><span class="status-pill status-ready">@device.Status</span></div><h2>@device.Name</h2><div class="device-code">@device.Code</div><div class="device-detail"><span>Modality</span><strong>Mô phỏng phần mềm</strong></div><div class="device-detail"><span>Giao thức phần cứng</span><strong>Chưa cấu hình</strong></div><small class="text-muted">@(device.LastSeenAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Chưa có heartbeat")</small></section></div>}</div>

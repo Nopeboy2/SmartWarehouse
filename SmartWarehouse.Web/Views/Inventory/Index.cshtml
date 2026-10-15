@@ -1,0 +1,24 @@
+﻿@model IReadOnlyList<SmartWarehouse.Application.Warehouse.InventoryRow>
+@{
+    ViewData["Title"] = "Tồn kho";
+    var receive = new SmartWarehouse.Web.ViewModels.StockOperationViewModel { ReferenceNumber = $"RCV-{DateTime.UtcNow:yyyyMMdd-HHmmss}", IdempotencyKey = Guid.NewGuid().ToString("N") };
+    var reserve = new SmartWarehouse.Web.ViewModels.StockOperationViewModel { ReferenceNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd-HHmmss}", IdempotencyKey = Guid.NewGuid().ToString("N") };
+    var dispatch = new SmartWarehouse.Web.ViewModels.StockOperationViewModel { ReferenceNumber = $"SHP-{DateTime.UtcNow:yyyyMMdd-HHmmss}", IdempotencyKey = Guid.NewGuid().ToString("N") };
+}
+<div class="page-heading"><div><span class="eyebrow">KIỂM SOÁT TỒN KHO</span><h1>Tồn kho & thao tác</h1><p>Tồn khả dụng được tính bằng tồn thực tế trừ lượng đã giữ chỗ.</p></div></div>
+@if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
+@if (TempData["Info"] is string info) { <div class="alert alert-info">@info</div> }
+@if (TempData["Error"] is string error) { <div class="alert alert-danger">@error</div> }
+<div class="row g-3 mb-4"><div class="col-12 col-xl-8"><section class="panel h-100"><div class="panel-heading"><div><h2>Số dư theo vị trí</h2><p>@Model.Count dòng tồn kho</p></div><span class="status-pill status-ready">Đồng bộ từ database</span></div>
+<div class="table-responsive"><table class="table align-middle data-table"><thead><tr><th>SKU / Sản phẩm</th><th>Vị trí</th><th class="text-end">Tồn thực</th><th class="text-end">Giữ chỗ</th><th class="text-end">Khả dụng</th><th class="text-end">Đang vận chuyển</th></tr></thead><tbody>
+@foreach (var row in Model) { <tr><td><span class="sku-code">@row.Sku</span><small class="d-block text-muted mt-1">@row.ProductName</small></td><td>@row.LocationCode</td><td class="text-end">@row.OnHand</td><td class="text-end">@row.Reserved</td><td class="text-end fw-semibold">@row.Available</td><td class="text-end">@row.InTransit</td></tr> }
+</tbody></table></div>
+@if (Model.Count == 0) { <div class="empty-state"><strong>Chưa có tồn kho</strong><p>Ghi nhận phiếu nhập để bắt đầu tạo số dư.</p></div> }
+</section></div>
+<div class="col-12 col-xl-4"><section class="panel"><div class="panel-heading"><div><h2>Thao tác demo</h2><p>Các giao dịch được ghi sổ và chống trùng bằng khóa idempotency.</p></div></div>
+<ul class="nav nav-pills operation-tabs" role="tablist"><li><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#receivePane" type="button">Nhập</button></li><li><button class="nav-link" data-bs-toggle="pill" data-bs-target="#reservePane" type="button">Giữ chỗ</button></li><li><button class="nav-link" data-bs-toggle="pill" data-bs-target="#dispatchPane" type="button">Xuất</button></li></ul>
+<div class="tab-content pt-3">
+<div class="tab-pane fade show active" id="receivePane"><form asp-action="Receive" method="post"><partial name="_StockOperationForm" model="receive" /><button class="btn btn-primary w-100" type="submit">Ghi nhận nhập kho</button></form></div>
+<div class="tab-pane fade" id="reservePane"><form asp-action="Reserve" method="post"><partial name="_StockOperationForm" model="reserve" /><button class="btn btn-primary w-100" type="submit">Giữ chỗ hàng</button></form></div>
+<div class="tab-pane fade" id="dispatchPane"><form asp-action="Dispatch" method="post"><partial name="_StockOperationForm" model="dispatch" /><button class="btn btn-primary w-100" type="submit">Xác nhận xuất</button></form></div>
+</div></section></div></div>

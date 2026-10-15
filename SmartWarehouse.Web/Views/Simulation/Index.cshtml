@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Mô phỏng kho";
+}
+<div class="page-heading"><div><span class="eyebrow">DIGITAL TWIN · DEMO</span><h1>Mô phỏng kho thông minh</h1><p>Trạng thái được phát từ backend qua SignalR; luồng hàng minh họa RFID, băng tải và AGV.</p></div><span id="connectionState" class="status-pill status-muted">Đang kết nối...</span></div>
+@if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
+@if (TempData["Error"] is string error) { <div class="alert alert-danger">@error</div> }
+@if (TempData["Info"] is string info) { <div class="alert alert-warning">@info</div> }
+<div class="row g-3">
+    <div class="col-12 col-xxl-9"><section class="panel simulation-panel"><div class="panel-heading"><div><h2>Mặt bằng kho · Khu A</h2><p>Sơ đồ 2D giản lược, không đại diện cho hệ thống an toàn phần cứng.</p></div><div class="live-indicator"><i></i> BACKEND LIVE</div></div>
+    <div class="warehouse-canvas-wrap"><canvas id="warehouseCanvas" width="1000" height="430" aria-label="Sơ đồ kho mô phỏng 2D"></canvas></div>
+    <div class="simulation-legend"><span><i class="legend-square legend-dock"></i> Tiếp nhận / xuất hàng</span><span><i class="legend-square legend-rfid"></i> Cổng RFID</span><span><i class="legend-square legend-rack"></i> Kệ lưu trữ</span><span><i class="legend-square legend-agv"></i> AGV</span><span><i class="legend-square legend-conveyor"></i> Băng tải</span></div>
+    </section></div>
+    <div class="col-12 col-xxl-3"><section class="panel simulation-control"><div class="panel-heading"><div><h2>Điều khiển luồng</h2><p>Chỉ chạy một quy trình mỗi lần</p></div></div>
+        <form asp-action="StartInbound" method="post"><button class="btn btn-primary w-100 mb-2" type="submit">▶ &nbsp; Chạy quy trình nhập</button></form>
+        <form asp-action="StartOutbound" method="post"><button class="btn btn-outline-success w-100 mb-2" type="submit">↗ &nbsp; Chạy quy trình xuất</button></form>
+        <form asp-action="Fault" method="post"><button class="btn btn-outline-danger w-100 mb-2" type="submit">⚠ &nbsp; Mô phỏng băng tải kẹt</button></form><form asp-action="Reset" method="post"><button class="btn btn-light w-100" type="submit">↻ &nbsp; Đặt lại thiết bị mô phỏng</button></form>
+        <div class="simulation-status-card"><div class="d-flex justify-content-between"><span class="metric-label">Tiến trình</span><strong id="progressValue">0%</strong></div><div class="progress mt-2"><div id="progressBar" class="progress-bar" style="width:0%"></div></div><strong id="stepTitle" class="d-block mt-3">Đang chờ lệnh</strong><small id="stepDetail">Khởi chạy một quy trình để xem thiết bị hoạt động.</small></div>
+        <div class="telemetry"><div><span>EPC gần nhất</span><strong id="epcValue">—</strong></div><div><span>Mã nhiệm vụ AGV</span><strong id="taskValue">—</strong></div><div><span>Trạng thái</span><strong id="stateValue">Sẵn sàng</strong></div></div>
+    </section></div>
+</div>
+<div class="row g-3 mt-1">
+    <div class="col-12"><section class="panel"><div class="panel-heading"><div><h2>Trình tự nghiệp vụ</h2><p>Đọc RFID không tự động làm thay đổi tồn kho; backend xác nhận giao dịch ở cuối luồng.</p></div></div><div class="flow-steps" id="flowSteps"><div data-stage="receiving">01 <span>Tiếp nhận</span></div><i></i><div data-stage="rfid">02 <span>Đọc EPC</span></div><i></i><div data-stage="conveyor">03 <span>Băng tải</span></div><i></i><div data-stage="agv">04 <span>AGV</span></div><i></i><div data-stage="storage">05 <span>Bàn giao / xác nhận</span></div></div></section></div>
+</div>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8.0.7/dist/browser/signalr.min.js"></script>
+<script>
+(() => {
+ const canvas=document.getElementById('warehouseCanvas'), ctx=canvas.getContext('2d');
+ const state={flow:'',stage:'idle',percent:0,error:false};
+ const points={receiving:[92,215],order:[92,215],rfid:[260,215],conveyor:[445,215],agv:[650,315],storage:[820,145],dispatch:[920,215]};
+ function draw(){
+  const sx=canvas.clientWidth/canvas.width, sy=canvas.clientHeight/canvas.height; ctx.setTransform(sx,sy,0,0,0,0); ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#f7faf7';ctx.fillRect(10,10,980,410);ctx.strokeStyle='#dfe9e2';ctx.lineWidth=2;ctx.strokeRect(10,10,980,410);
+  ctx.font='600 13px Segoe UI';ctx.fillStyle='#61716a';ctx.fillText('KHU TIẾP NHẬN',35,75);ctx.fillText('CỔNG RFID',218,75);ctx.fillText('BĂNG TẢI',390,75);ctx.fillText('TRUNG CHUYỂN',560,75);ctx.fillText('KỆ HÀNG',780,75);ctx.fillText('XUẤT HÀNG',875,365);
+  ctx.fillStyle='#e7f3eb';ctx.fillRect(32,92,112,232);ctx.fillStyle='#d9eee2';ctx.fillRect(215,100,82,216);
+  ctx.strokeStyle='#a5c8b2';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(297,210);ctx.lineTo(570,210);ctx.stroke();
+  for(let x=315;x<560;x+=24){ctx.strokeStyle='#c4d9cb';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,203);ctx.lineTo(x+8,217);ctx.stroke()}
+  ctx.fillStyle='#eaf0ed';ctx.fillRect(745,84,205,235);
+  for(let y=104;y<294;y+=58){for(let x=762;x<934;x+=48){ctx.fillStyle='#b5cec0';ctx.fillRect(x,y,38,43);ctx.fillStyle='#fff';ctx.fillRect(x+5,y+5,28,33)}}
+  ctx.fillStyle='#667c72';ctx.font='11px Segoe UI';ctx.fillText('A-01-01',790,128);
+  let pos=points[state.stage]||[92,215]; if(state.flow==='outbound'&&state.stage==='agv')pos=[820,175]; if(state.flow==='outbound'&&state.stage==='conveyor')pos=[445,215]; if(state.flow==='outbound'&&state.stage==='rfid')pos=[260,215];
+  if(state.stage!=='idle'&&state.stage!=='completed'&&!state.error){ctx.fillStyle='rgba(31,119,80,.12)';ctx.beginPath();ctx.arc(pos[0],pos[1],34,0,Math.PI*2);ctx.fill();ctx.fillStyle='#25845e';ctx.fillRect(pos[0]-15,pos[1]-11,30,22);ctx.fillStyle='#fff';ctx.font='bold 9px Segoe UI';ctx.fillText(state.stage==='agv'?'AGV':'PKG',pos[0]-11,pos[1]+3)}
+  if(state.error){ctx.fillStyle='#bd4c4c';ctx.beginPath();ctx.arc(445,215,20,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 18px Segoe UI';ctx.fillText('!',439,221)}
+ }
+ new ResizeObserver(draw).observe(canvas);draw();
+ if(!window.signalR){document.getElementById('connectionState').textContent='Không tải được SignalR';return;}
+ const connection=new signalR.HubConnectionBuilder().withUrl('/hubs/warehouse').withAutomaticReconnect().build();
+ connection.on('SimulationStep',u=>{state.flow=u.flow;state.stage=u.state==='reset'?'idle':u.state;state.percent=u.percent;state.error=u.state==='error';document.getElementById('progressValue').textContent=u.percent+'%';document.getElementById('progressBar').style.width=u.percent+'%';document.getElementById('stepTitle').textContent=u.message;document.getElementById('stepDetail').textContent=new Date(u.updatedAt).toLocaleTimeString('vi-VN');document.getElementById('epcValue').textContent=u.epc||'—';document.getElementById('taskValue').textContent=u.taskNumber||'—';document.getElementById('stateValue').textContent=u.state==='completed'?'Hoàn tất':u.state==='error'?'Cảnh báo':'Đang chạy';document.querySelectorAll('#flowSteps [data-stage]').forEach(e=>{e.classList.toggle('step-active',e.dataset.stage===u.state);e.classList.toggle('step-done',u.percent>0&&u.percent>=((parseInt(e.innerText,10))*20));});draw();});
+ connection.start().then(()=>{const el=document.getElementById('connectionState');el.textContent='Đang kết nối';el.className='status-pill status-ready'}).catch(()=>{const el=document.getElementById('connectionState');el.textContent='SignalR ngoại tuyến';el.className='status-pill status-muted'});
+ connection.onreconnecting(()=>{const el=document.getElementById('connectionState');el.textContent='Đang kết nối lại';el.className='status-pill status-muted'});
+ connection.onreconnected(()=>{const el=document.getElementById('connectionState');el.textContent='Đang kết nối';el.className='status-pill status-ready'});
+})();
+</script>
+}
+
+
+
+

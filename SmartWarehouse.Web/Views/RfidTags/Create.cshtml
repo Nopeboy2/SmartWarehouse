@@ -1,0 +1,7 @@
+﻿@model SmartWarehouse.Web.ViewModels.CreateRfidTagViewModel
+@{
+    ViewData["Title"] = "Gán thẻ RFID";
+}
+<div class="page-heading"><div><span class="eyebrow">NHẬN DIỆN HÀNG HÓA</span><h1>Gán thẻ RFID</h1><p>Nhập EPC dạng hex và SKU đã tồn tại.</p></div><a class="btn btn-light" asp-action="Index">← Danh sách</a></div>
+<section class="panel form-panel"><form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div><div class="mb-3"><label asp-for="Epc" class="form-label">EPC</label><input asp-for="Epc" class="form-control" placeholder="E2806894A000000000000001"/><span asp-validation-for="Epc" class="text-danger"></span><small class="form-text">Hỗ trợ độ dài 24, 28, 32, 48 hoặc 64 ký tự hex.</small></div><div class="mb-3"><label asp-for="Sku" class="form-label">SKU</label><input asp-for="Sku" class="form-control" placeholder="DEMO-001"/><span asp-validation-for="Sku" class="text-danger"></span></div><div class="form-actions"><a asp-action="Index" class="btn btn-light">Hủy</a><button type="submit" class="btn btn-primary">Gán EPC</button></div></form></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

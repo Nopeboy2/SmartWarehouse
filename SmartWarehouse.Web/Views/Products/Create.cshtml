@@ -1,0 +1,13 @@
+﻿@model SmartWarehouse.Web.ViewModels.CreateProductViewModel
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+}
+<div class="page-heading"><div><span class="eyebrow">DANH MỤC HÀNG HÓA</span><h1>Thêm sản phẩm</h1><p>SKU là mã định danh duy nhất của loại hàng hóa.</p></div><a class="btn btn-light" asp-action="Index">← Danh sách</a></div>
+<section class="panel form-panel"><form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div><div class="row g-3">
+    <div class="col-md-6"><label asp-for="Sku" class="form-label">SKU</label><input asp-for="Sku" class="form-control" placeholder="VD: BOX-001" /><span asp-validation-for="Sku" class="text-danger"></span></div>
+    <div class="col-md-6"><label asp-for="Name" class="form-label">Tên sản phẩm</label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+    <div class="col-md-6"><label asp-for="CategoryId" class="form-label">Danh mục</label><select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"><option value="">Chọn danh mục</option></select><span asp-validation-for="CategoryId" class="text-danger"></span></div>
+    <div class="col-md-6"><label asp-for="UnitOfMeasure" class="form-label">Đơn vị tính</label><input asp-for="UnitOfMeasure" class="form-control" /><span asp-validation-for="UnitOfMeasure" class="text-danger"></span></div>
+    <div class="col-12"><label asp-for="Description" class="form-label">Mô tả</label><textarea asp-for="Description" class="form-control" rows="3"></textarea></div>
+</div><div class="form-actions"><a class="btn btn-light" asp-action="Index">Hủy</a><button class="btn btn-primary" type="submit">Lưu sản phẩm</button></div></form></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

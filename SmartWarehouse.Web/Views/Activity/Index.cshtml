@@ -1,0 +1,4 @@
+﻿@model IReadOnlyList<SmartWarehouse.Application.Warehouse.ActivityRow>
+@{ ViewData["Title"] = "Lịch sử hoạt động"; }
+<div class="page-heading"><div><span class="eyebrow">NHẬT KÝ HỆ THỐNG</span><h1>Lịch sử hoạt động</h1><p>Giao dịch tồn kho, đọc RFID và sự kiện thiết bị gần đây.</p></div></div>
+<section class="panel"><div class="table-responsive"><table class="table data-table align-middle"><thead><tr><th>Thời gian</th><th>Nguồn</th><th>Sự kiện</th><th>Chi tiết</th><th>Kết quả</th></tr></thead><tbody>@foreach(var row in Model){<tr><td>@row.OccurredAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td><td>@row.Source</td><td>@row.Title</td><td>@row.Detail</td><td>@row.Status</td></tr>}</tbody></table></div>@if(Model.Count==0){<div class="empty-state"><strong>Chưa có nhật ký</strong><p>Giao dịch và sự kiện sẽ được ghi tự động.</p></div>}</section>

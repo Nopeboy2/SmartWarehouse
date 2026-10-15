@@ -1,0 +1,55 @@
+@{
+    var title = ViewData["Title"] as string ?? "Smart Warehouse";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title · Smart Warehouse</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">W</span><span><strong>WAREHOUSE</strong><small>SMART OPERATIONS</small></span></a>
+        <div class="nav-caption">VẬN HÀNH</div>
+        <nav class="side-nav">
+            <a asp-controller="Home" asp-action="Index"><span class="nav-icon">◫</span>Tổng quan</a>
+            <a asp-controller="Products" asp-action="Index"><span class="nav-icon">▦</span>Sản phẩm</a>
+            <a asp-controller="Categories" asp-action="Index"><span class="nav-icon">◈</span>Danh mục</a>
+            <a asp-controller="Locations" asp-action="Index"><span class="nav-icon">⌖</span>Vị trí kho</a>
+            <a asp-controller="Inventory" asp-action="Index"><span class="nav-icon">▤</span>Tồn kho & giao dịch</a>
+            <a asp-controller="RfidTags" asp-action="Index"><span class="nav-icon">⌗</span>Thẻ RFID</a>
+           <a asp-controller="Simulation" asp-action="Index"><span class="nav-icon">⌘</span>Mô phỏng kho</a>
+        </nav>
+        <div class="nav-caption mt-4">THIẾT BỊ & BÁO CÁO</div>
+        <nav class="side-nav">
+            <a asp-controller="Devices" asp-action="Index"><span class="nav-icon">⌁</span>Thiết bị</a>
+            <a asp-controller="Reports" asp-action="Index"><span class="nav-icon">▥</span>Báo cáo</a>
+            <a asp-controller="Alerts" asp-action="Index"><span class="nav-icon">⚠</span>Cảnh báo</a>
+            <a asp-controller="Activity" asp-action="Index"><span class="nav-icon">◷</span>Lịch sử hoạt động</a>
+        </nav>
+        <div class="sidebar-bottom"><span class="system-dot"></span><span>Chế độ mô phỏng<small>Phần cứng chưa kết nối</small></span></div>
+    </aside>
+    <div class="main-column">
+        <header class="topbar"><button class="menu-toggle" type="button" aria-label="Mở điều hướng" onclick="document.body.classList.toggle('sidebar-open')">☰</button><div class="breadcrumb-label"><span class="breadcrumb-root">Kho chính</span><span class="breadcrumb-divider">/</span><span class="breadcrumb-current">@title</span></div><div class="topbar-right"><span class="mode-badge"><i></i> SIMULATION</span>@if (User.Identity?.IsAuthenticated == true) { <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form"><span class="signed-user">@User.Identity.Name</span><button class="btn btn-light btn-sm" type="submit">Đăng xuất</button></form> } else { <a class="btn btn-light btn-sm" asp-controller="Account" asp-action="Login">Đăng nhập</a> }</div></header>
+        <main class="content-area">
+            @if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
+            @RenderBody()
+        </main>
+        <footer class="app-footer"><span>Smart Warehouse Management System</span><span>Demo · .NET 8</span></footer>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+
+
+

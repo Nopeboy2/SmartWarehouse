@@ -1,0 +1,7 @@
+﻿@model SmartWarehouse.Application.Warehouse.DashboardSummary
+@{
+    ViewData["Title"] = "Báo cáo";
+}
+<div class="page-heading"><div><span class="eyebrow">PHÂN TÍCH VẬN HÀNH</span><h1>Báo cáo nhanh</h1><p>Tóm tắt dữ liệu giao dịch hiện có trong hệ thống.</p></div></div>
+<div class="row g-3"><div class="col-md-4"><div class="metric-card"><span class="metric-label">SKU hoạt động</span><strong>@Model.ProductCount</strong></div></div><div class="col-md-4"><div class="metric-card accent-blue"><span class="metric-label">Đơn vị tồn thực</span><strong>@Model.StockUnits.ToString("N0")</strong></div></div><div class="col-md-4"><div class="metric-card accent-orange"><span class="metric-label">Cảnh báo mở</span><strong>@Model.OpenAlerts</strong></div></div></div>
+<section class="panel mt-3"><div class="panel-heading"><div><h2>Giao dịch gần đây</h2><p>Dữ liệu được tổng hợp trực tiếp từ sổ kho.</p></div></div><div class="table-responsive"><table class="table data-table"><thead><tr><th>Ngày giờ</th><th>SKU</th><th>Loại</th><th>Tham chiếu</th><th>Số lượng</th></tr></thead><tbody>@foreach(var row in Model.RecentMovements){<tr><td>@row.OccurredAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td><td>@row.Sku</td><td>@row.Type</td><td>@row.ReferenceNumber</td><td>@row.Quantity</td></tr>}</tbody></table></div></section>

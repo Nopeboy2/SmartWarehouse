@@ -1,0 +1,28 @@
+﻿@model SmartWarehouse.Application.Warehouse.DashboardSummary
+@{
+    ViewData["Title"] = "Tổng quan";
+}
+<div class="page-heading">
+    <div><span class="eyebrow">TRUNG TÂM ĐIỀU HÀNH</span><h1>Tổng quan kho</h1><p>Theo dõi hàng hóa và hoạt động kho theo thời gian thực.</p></div>
+    <a class="btn btn-primary" asp-controller="Inventory" asp-action="Index">+ Tạo thao tác kho</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3"><div class="metric-card"><span class="metric-label">Sản phẩm đang hoạt động</span><strong>@Model.ProductCount</strong><span class="metric-foot">SKU trong danh mục</span></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="metric-card accent-blue"><span class="metric-label">Tổng số lượng trong kho</span><strong>@Model.StockUnits.ToString("N0")</strong><span class="metric-foot">Đơn vị hàng hóa</span></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="metric-card accent-orange"><span class="metric-label">Nhiệm vụ AGV đang chạy</span><strong>@Model.ActiveTasks</strong><span class="metric-foot">Hàng đợi vận chuyển</span></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="metric-card accent-red"><span class="metric-label">Cảnh báo chưa xử lý</span><strong>@Model.OpenAlerts</strong><span class="metric-foot">Cần kiểm tra</span></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-12 col-xl-8"><section class="panel h-100"><div class="panel-heading"><div><h2>Giao dịch gần đây</h2><p>Nhật ký thay đổi tồn kho</p></div><a asp-controller="Inventory" asp-action="Index">Xem tồn kho <span aria-hidden="true">→</span></a></div>
+        @if (Model.RecentMovements.Count == 0) { <div class="empty-state"><div class="empty-icon">↗</div><strong>Chưa có giao dịch</strong><p>Các thao tác nhập, giữ chỗ và xuất kho sẽ xuất hiện ở đây.</p></div> }
+        else { <div class="table-responsive"><table class="table align-middle data-table"><thead><tr><th>Thời gian</th><th>SKU</th><th>Loại giao dịch</th><th>Tham chiếu</th><th class="text-end">SL</th></tr></thead><tbody>
+        @foreach (var movement in Model.RecentMovements) { <tr><td>@movement.OccurredAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td><span class="sku-code">@movement.Sku</span></td><td>@movement.Type</td><td>@movement.ReferenceNumber</td><td class="text-end fw-semibold">@movement.Quantity</td></tr> }
+        </tbody></table></div> }
+    </section></div>
+    <div class="col-12 col-xl-4"><section class="panel h-100"><div class="panel-heading"><div><h2>Trạng thái thiết bị</h2><p>Mô phỏng thiết bị kho</p></div><span class="live-indicator"><i></i> Đang kết nối</span></div>
+        <div class="device-line"><span class="device-symbol">RF</span><div><strong>RFID Reader</strong><small>Cổng nhập · Mô phỏng</small></div><span class="status-pill status-ready">Sẵn sàng</span></div>
+        <div class="device-line"><span class="device-symbol">BT</span><div><strong>Băng tải chính</strong><small>Line 01 · Mô phỏng</small></div><span class="status-pill status-ready">Sẵn sàng</span></div>
+        <div class="device-line"><span class="device-symbol">AG</span><div><strong>AGV-01</strong><small>Pin 96% · Mô phỏng</small></div><span class="status-pill status-ready">Đang chờ</span></div>
+        <a class="btn btn-light w-100 mt-3" asp-controller="Simulation" asp-action="Index">Mở mô phỏng kho <span aria-hidden="true">→</span></a>
+    </section></div>
+</div>

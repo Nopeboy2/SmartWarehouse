@@ -1,0 +1,5 @@
+﻿@model SmartWarehouse.Web.ViewModels.CreateCategoryViewModel
+@{ ViewData["Title"] = "Thêm danh mục"; }
+<div class="page-heading"><div><span class="eyebrow">DANH MỤC HÀNG HÓA</span><h1>Thêm danh mục</h1><p>Mã danh mục phải duy nhất.</p></div></div>
+<section class="panel form-panel"><form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="mb-3"><label asp-for="Code" class="form-label">Mã</label><input asp-for="Code" class="form-control"/></div><div class="mb-3"><label asp-for="Name" class="form-label">Tên</label><input asp-for="Name" class="form-control"/></div><div class="form-actions"><a class="btn btn-light" asp-action="Index">Hủy</a><button class="btn btn-primary">Lưu danh mục</button></div></form></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
